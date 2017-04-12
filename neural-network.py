@@ -1,5 +1,4 @@
 from __future__ import print_function
-import random
 import math
 import csv
 import random
@@ -31,6 +30,7 @@ with open('iris.csv', 'rb') as csvfile:
 					str.append(1.0)
 
 		iris.append(str)
+	random.shuffle(iris)
 	random.shuffle(iris)
 	print(iris)
 # inp1, inp2, inp3, out1,2,3 dla: setosa, versicolor, virginica
@@ -116,28 +116,27 @@ class Neuron:
 			if isinstance(self.input_connections[i], Neuron):
 				self.input_weights[i] += 1.0 * self.delta * self.input_connections[i].y
 
-
-#inputs = [0.1, 0.2, 0.3]
-#outputs = [0.1, 0.8]
-
 count_ok = 0
 iterations = 100
 
+# training -------------------------------------------------------------------------------------------------------------
 
+inputs = [Input(1, 0.0), Input(2, 0.0), Input(3, 0.0), Input(3, 0.0)]
+layer1 = [Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs)]
+layer2 = [Neuron(8, layer1), Neuron(4, inputs), Neuron(9, layer1), Neuron(10, layer1)]
+layer3 = [Neuron(11, layer2, 0.0), Neuron(12, layer2, 0.0), Neuron(13, layer2, 0.0)]
 
+network = [inputs, layer1, layer2, layer3]
 
-for item in iris:
+for item in iris[0:30]:
 	inputs = item[0:4]
 	outputs = item[4:7]
 
-	inputs = [Input(1, inputs[0]), Input(2, inputs[1]), Input(3, inputs[2]), Input(3, inputs[3])]
-	layer1 = [Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs)]
-	layer2 = [Neuron(8, layer1), Neuron(4, inputs), Neuron(9, layer1), Neuron(10, layer1)]
-	layer3 = [Neuron(11, layer2, outputs[0]), Neuron(12, layer2, outputs[1]), Neuron(13, layer2, outputs[2])]
+	for (i, obj) in enumerate(network[0]):
+		obj._sum = inputs[i]
 
-	network = [inputs, layer1, layer2, layer3]
-
-	print("Desired outputs: {}".format(outputs))
+	for (i, obj) in enumerate(network[3]):
+		obj.desired_output = outputs[i]
 
 	for s in range(iterations):
 
@@ -157,24 +156,42 @@ for item in iris:
 					l.compute_sum()
 					l.compute_my_function()
 
-		for l in network:
-			if isinstance(l[len(l) - 1], Neuron) and l == network[len(network) - 1] and s == iterations - 1:
-				print("output:", l[0].y, l[1].y, l[2].y)
-				max = l[0].y
-				ind = 0
-				if l[1].y > max:
-					ind = 1
-				if l[2].y > max:
-					ind = 2
+# testing --------------------------------------------------------------------------------------------------------------
 
-				max_des = outputs[0]
-				ind_des = 0
-				if outputs[1] > max_des:
-					ind_des = 1
-				if outputs[2] > max_des:
-					ind_des = 2
+for item in iris[30:len(iris)-1]:
+	inputs = item[0:4]
+	outputs = item[4:7]
 
-				if ind == ind_des:
-					count_ok += 1
+	for (i, obj) in enumerate(network[0]):
+		obj._sum = inputs[i]
 
-print("ok %: ", (count_ok / iterations)*100 )
+	for n in network:
+		for l in n:
+			if isinstance(l, Neuron):
+				l.compute_sum()
+				l.compute_my_function()
+
+	print("Desired outputs: {}".format(outputs))
+
+	for l in network:
+		if isinstance(l[len(l) - 1], Neuron) and l == network[len(network) - 1]:
+			print("output:", l[0].y, l[1].y, l[2].y)
+			_max = l[0].y
+			ind = 0
+			if l[1].y > _max:
+				ind = 1
+			if l[2].y > _max:
+				ind = 2
+
+			max_des = outputs[0]
+			ind_des = 0
+			if outputs[1] > max_des:
+				ind_des = 1
+			if outputs[2] > max_des:
+				ind_des = 2
+
+			if ind == ind_des:
+				count_ok += 1
+
+result = float(count_ok)/len(iris[30:len(iris)-1])*100
+print("ok = {:.2f} %".format(result))
