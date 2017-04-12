@@ -7,33 +7,30 @@ random_range = [-0.1, 0.1]
 
 with open('iris.csv', 'rb') as csvfile:
 	iris_dataset = csv.reader(csvfile, delimiter=',')
-	str = []
 	iris = []
 	for row in iris_dataset:
-		str = []
+		_str = []
 		for i in row:
 			try:
 				float(i)
-				str.append(float(i))
+				_str.append(float(i))
 			except ValueError:
 				if i == 'Iris-setosa':
-					str.append(1.0)
-					str.append(0.0)
-					str.append(0.0)
+					_str.append(1.0)
+					_str.append(0.0)
+					_str.append(0.0)
 				elif i == 'Iris-versicolor':
-					str.append(0.0)
-					str.append(1.0)
-					str.append(0.0)
+					_str.append(0.0)
+					_str.append(1.0)
+					_str.append(0.0)
 				elif i == 'Iris-virginica':
-					str.append(0.0)
-					str.append(0.0)
-					str.append(1.0)
+					_str.append(0.0)
+					_str.append(0.0)
+					_str.append(1.0)
+		iris.append(_str)
 
-		iris.append(str)
 	random.shuffle(iris)
-	random.shuffle(iris)
-	print(iris)
-# inp1, inp2, inp3, out1,2,3 dla: setosa, versicolor, virginica
+
 
 class Input:
 	def __init__(self, _id, _sum):
@@ -41,14 +38,14 @@ class Input:
 		self._sum = _sum
 		self.output_connections = []
 
-	def __str__(self):
-		return str(self._id)
+	# def __str__(self):
+	# 	return str(self._id)
 
-	def print_neuron(self):
-		print("Input  _id={}:\t\t|\t".format(self._id), end='')
-		for o in self.output_connections:
-			print("{} ".format(o), end='')
-		print("")
+	# def print_neuron(self):
+	# 	print("Input  _id={}:\t\t|\t".format(self._id), end='')
+	# 	for o in self.output_connections:
+	# 		print("{} ".format(o), end='')
+	# 	print("")
 
 
 class Neuron:
@@ -68,11 +65,11 @@ class Neuron:
 		self.compute_sum()
 		self.compute_my_function()
 
-	def __str__(self):
-		return str(self._id)
+	# def __str__(self):
+	# 	return str(self._id)
 
 	def compute_random_weights(self):
-		for i in self.input_connections:
+		for r in self.input_connections:
 			self.input_weights.append(random.uniform(random_range[0], random_range[1]))
 
 	def set_this_neuron_in_antecedent_output(self):
@@ -81,14 +78,14 @@ class Neuron:
 				obj.output_connections.append(self)
 				obj.output_weights.append(self.input_weights[i])
 
-	def print_neuron(self):
-		print("Neuron _id={}:\t".format(self._id), end='')
-		for i in self.input_connections:
-			print("{} ".format(i), end='')
-		print("  |\t", end='')
-		for o in self.output_connections:
-			print("{} ".format(o), end='')
-		print(" // _sum={} // Y={} //Delta={}".format(str(self._sum), str(self.y), str(self.delta)))
+	# def print_neuron(self):
+	# 	print("Neuron _id={}:\t".format(self._id), end='')
+	# 	for i in self.input_connections:
+	# 		print("{} ".format(i), end='')
+	# 	print("  |\t", end='')
+	# 	for o in self.output_connections:
+	# 		print("{} ".format(o), end='')
+	# 	print(" // _sum={} // Y={} //Delta={}".format(str(self._sum), str(self.y), str(self.delta)))
 
 	def compute_sum(self):
 		self._sum = 0
@@ -105,7 +102,7 @@ class Neuron:
 
 	def compute_delta(self):
 		if self.desired_output is not None:
-			self.delta = (self.desired_output - self.y) * self.derivative() #self._sum
+			self.delta = (self.desired_output - self.y) * self.derivative()
 		else:
 			self.delta = 0
 			for i in range(0, len(self.output_connections)):
@@ -118,7 +115,7 @@ class Neuron:
 
 count_ok = 0
 iterations = 100
-
+division_point = 50
 # training -------------------------------------------------------------------------------------------------------------
 
 inputs = [Input(1, 0.0), Input(2, 0.0), Input(3, 0.0), Input(3, 0.0)]
@@ -128,7 +125,7 @@ layer3 = [Neuron(11, layer2, 0.0), Neuron(12, layer2, 0.0), Neuron(13, layer2, 0
 
 network = [inputs, layer1, layer2, layer3]
 
-for item in iris[0:30]:
+for item in iris[0:division_point]:
 	inputs = item[0:4]
 	outputs = item[4:7]
 
@@ -158,7 +155,7 @@ for item in iris[0:30]:
 
 # testing --------------------------------------------------------------------------------------------------------------
 
-for item in iris[30:len(iris)-1]:
+for item in iris[division_point:len(iris)-1]:
 	inputs = item[0:4]
 	outputs = item[4:7]
 
@@ -193,5 +190,5 @@ for item in iris[30:len(iris)-1]:
 			if ind == ind_des:
 				count_ok += 1
 
-result = float(count_ok)/len(iris[30:len(iris)-1])*100
+result = float(count_ok)/len(iris[division_point:len(iris)-1])*100
 print("ok = {:.2f} %".format(result))
