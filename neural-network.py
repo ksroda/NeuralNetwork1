@@ -35,7 +35,7 @@ with open('iris.csv', 'rb') as csvfile:
 class Input:
 	def __init__(self, _id, _sum):
 		self._id = _id
-		self._sum = _sum
+		self.y = _sum
 		self.output_connections = []
 
 	# def __str__(self):
@@ -59,11 +59,14 @@ class Neuron:
 		self.delta = 0
 		self.y = 0
 		self.desired_output = desired_output
+		self.bias = 1.0
+		self.learningWeight = 0.1
+		self.biasWeight = random.uniform(random_range[0], random_range[1])
 
 		self.compute_random_weights()
 		self.set_this_neuron_in_antecedent_output()
-		self.compute_sum()
-		self.compute_my_function()
+		# self.compute_sum()
+		# self.compute_my_function()
 
 	# def __str__(self):
 	# 	return str(self._id)
@@ -90,9 +93,9 @@ class Neuron:
 	def compute_sum(self):
 		self._sum = 0
 		for i in range(0, len(self.input_connections)):
-			if isinstance(self.input_connections[i], Neuron):
-				self._sum += self.input_connections[i].y * self.input_weights[i]
-		self._sum += 1.0
+			#if isinstance(self.input_connections[i], Neuron):
+			self._sum += self.input_connections[i].y * self.input_weights[i]
+		self._sum += self.biasWeight
 
 	def compute_my_function(self):
 		self.y = 1 / (1 + math.exp(-1 * self._sum))
@@ -102,40 +105,47 @@ class Neuron:
 
 	def compute_delta(self):
 		if self.desired_output is not None:
-			self.delta = (self.desired_output - self.y) * self.derivative()
+			self.delta = (self.desired_output - self.y)
 		else:
 			self.delta = 0
 			for i in range(0, len(self.output_connections)):
 				self.delta += self.output_connections[i].delta * self.output_weights[i] * self.output_connections[i].derivative()
 
 	def improve_weights(self):
+		self.biasWeight += self.learningWeight * self.delta * self.bias * self.derivative()
 		for i in range(0, len(self.input_weights)):
 			if isinstance(self.input_connections[i], Neuron):
-				self.input_weights[i] += 1.0 * self.delta * self.input_connections[i].y
+				self.input_weights[i] += self.learningWeight * self.delta * self.input_connections[i].y
 
 count_ok = 0
-iterations = 100
-division_point = 50
+iterations = 500
+division_point = 75
+
 # training -------------------------------------------------------------------------------------------------------------
 
 inputs = [Input(1, 0.0), Input(2, 0.0), Input(3, 0.0), Input(3, 0.0)]
-layer1 = [Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs)]
-layer2 = [Neuron(8, layer1), Neuron(4, inputs), Neuron(9, layer1), Neuron(10, layer1)]
-layer3 = [Neuron(11, layer2, 0.0), Neuron(12, layer2, 0.0), Neuron(13, layer2, 0.0)]
+layer1 = [Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs), Neuron(8, inputs),Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs), Neuron(8, inputs)]
+#layer2 = [Neuron(8, layer1), Neuron(4, layer1), Neuron(9, layer1), Neuron(10, layer1)]
+layer3 = [Neuron(11, layer1, 0.0), Neuron(12, layer1, 0.0), Neuron(13, layer1, 0.0)]
 
-network = [inputs, layer1, layer2, layer3]
+network = [inputs, layer1, layer3]
 
-for item in iris[0:division_point]:
-	inputs = item[0:4]
-	outputs = item[4:7]
+for s in range(iterations):
+	for item in iris[0:division_point]:
+		inputs = item[0:4]
+		outputs = item[4:7]
 
-	for (i, obj) in enumerate(network[0]):
-		obj._sum = inputs[i]
+		for (i, obj) in enumerate(network[0]):
+			obj.y = inputs[i]
 
-	for (i, obj) in enumerate(network[3]):
-		obj.desired_output = outputs[i]
+		for (i, obj) in enumerate(network[len(network)-1]):
+			obj.desired_output = outputs[i]
 
-	for s in range(iterations):
+		for n in network:
+			for l in n:
+				if isinstance(l, Neuron):
+					l.compute_sum()
+					l.compute_my_function()
 
 		for n in reversed(network):
 			for l in reversed(n):
@@ -147,11 +157,6 @@ for item in iris[0:division_point]:
 				if isinstance(l, Neuron):
 					l.improve_weights()
 
-		for n in network:
-			for l in n:
-				if isinstance(l, Neuron):
-					l.compute_sum()
-					l.compute_my_function()
 
 # testing --------------------------------------------------------------------------------------------------------------
 
@@ -160,11 +165,12 @@ for item in iris[division_point:len(iris)-1]:
 	outputs = item[4:7]
 
 	for (i, obj) in enumerate(network[0]):
-		obj._sum = inputs[i]
+		obj.y = inputs[i]
 
 	for n in network:
 		for l in n:
 			if isinstance(l, Neuron):
+				#l.compute_random_weights()
 				l.compute_sum()
 				l.compute_my_function()
 
