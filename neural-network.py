@@ -60,7 +60,7 @@ class Neuron:
 		self.y = 0
 		self.desired_output = desired_output
 		self.bias = 1.0
-		self.learningWeight = 0.1
+		self.learningWeight = 0.5
 		self.biasWeight = random.uniform(random_range[0], random_range[1])
 
 		self.compute_random_weights()
@@ -96,9 +96,11 @@ class Neuron:
 			#if isinstance(self.input_connections[i], Neuron):
 			self._sum += self.input_connections[i].y * self.input_weights[i]
 		self._sum += self.biasWeight
+		#self._sum += self.bias
 
 	def compute_my_function(self):
 		self.y = 1 / (1 + math.exp(-1 * self._sum))
+		#self.y = math.tanh(self._sum)
 
 	def derivative(self):
 		return (1.0 - self.y) * self.y
@@ -118,8 +120,8 @@ class Neuron:
 				self.input_weights[i] += self.learningWeight * self.delta * self.input_connections[i].y
 
 count_ok = 0
-iterations = 500
-division_point = 75
+iterations = 400
+division_point = 60
 
 # training -------------------------------------------------------------------------------------------------------------
 
