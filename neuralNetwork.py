@@ -5,36 +5,39 @@ import random
 
 random_range = [-0.1, 0.1]
 
-with open('iris.csv', 'rb') as csvfile:
-	iris_dataset = csv.reader(csvfile, delimiter=',')
+
+def importIrises():
 	iris = []
-	for row in iris_dataset:
-		_str = []
-		for i in row:
-			try:
-				float(i)
-				_str.append(float(i))
-			except ValueError:
-				if i == 'Iris-setosa':
-					_str.append(1.0)
-					_str.append(0.0)
-					_str.append(0.0)
-				elif i == 'Iris-versicolor':
-					_str.append(0.0)
-					_str.append(1.0)
-					_str.append(0.0)
-				elif i == 'Iris-virginica':
-					_str.append(0.0)
-					_str.append(0.0)
-					_str.append(1.0)
-		iris.append(_str)
+	with open('iris.csv', 'rb') as csvfile:
+		iris_dataset = csv.reader(csvfile, delimiter=',')
+		for row in iris_dataset:
+			_str = []
+			for i in row:
+				try:
+					float(i)
+					_str.append(float(i))
+				except ValueError:
+					if i == 'Iris-setosa':
+						_str.append(1.0)
+						_str.append(0.0)
+						_str.append(0.0)
+					elif i == 'Iris-versicolor':
+						_str.append(0.0)
+						_str.append(1.0)
+						_str.append(0.0)
+					elif i == 'Iris-virginica':
+						_str.append(0.0)
+						_str.append(0.0)
+						_str.append(1.0)
+			iris.append(_str)
 
-	random.shuffle(iris)
+		random.shuffle(iris)
+	return iris
 
+iris = importIrises()
 
 class Input:
-	def __init__(self, _id, _sum):
-		self._id = _id
+	def __init__(self, _sum):
 		self.y = _sum
 		self.output_connections = []
 
@@ -49,8 +52,7 @@ class Input:
 
 
 class Neuron:
-	def __init__(self, _id, input_connections, desired_output=None):
-		self._id = _id
+	def __init__(self, input_connections, desired_output=None):
 		self.input_connections = input_connections
 		self.output_connections = []
 		self.input_weights = []
@@ -125,10 +127,11 @@ division_point = 60
 
 # training -------------------------------------------------------------------------------------------------------------
 
-inputs = [Input(1, 0.0), Input(2, 0.0), Input(3, 0.0), Input(3, 0.0)]
-layer1 = [Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs), Neuron(8, inputs),Neuron(5, inputs), Neuron(6, inputs), Neuron(7, inputs), Neuron(8, inputs)]
+inputs = [Input(0.0), Input(0.0), Input(0.0), Input(0.0)]
+layer1 = [Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs),
+				Neuron(inputs), Neuron(inputs)]
 #layer2 = [Neuron(8, layer1), Neuron(4, layer1), Neuron(9, layer1), Neuron(10, layer1)]
-layer3 = [Neuron(11, layer1, 0.0), Neuron(12, layer1, 0.0), Neuron(13, layer1, 0.0)]
+layer3 = [Neuron(layer1, 0.0), Neuron(layer1, 0.0), Neuron(layer1, 0.0)]
 
 network = [inputs, layer1, layer3]
 
