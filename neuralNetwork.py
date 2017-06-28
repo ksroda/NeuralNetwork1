@@ -122,14 +122,14 @@ class Neuron:
 				self.input_weights[i] += self.learningWeight * self.delta * self.input_connections[i].y
 
 count_ok = 0
-iterations = 400
+iterations = 300
 division_point = 60
 
 # training -------------------------------------------------------------------------------------------------------------
 
 inputs = [Input(0.0), Input(0.0), Input(0.0), Input(0.0)]
 layer1 = [Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs),
-				Neuron(inputs), Neuron(inputs)]
+				Neuron(inputs), Neuron(inputs), Neuron(inputs), Neuron(inputs)]
 #layer2 = [Neuron(8, layer1), Neuron(4, layer1), Neuron(9, layer1), Neuron(10, layer1)]
 layer3 = [Neuron(layer1, 0.0), Neuron(layer1, 0.0), Neuron(layer1, 0.0)]
 
